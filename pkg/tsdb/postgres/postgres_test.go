@@ -31,15 +31,16 @@ func TestIntegrationGenerateConnectionString(t *testing.T) {
 	cfg.DataPath = t.TempDir()
 
 	testCases := []struct {
-		desc        string
-		host        string
-		user        string
-		password    string
-		database    string
-		tlsSettings tlsSettings
-		expConnStr  string
-		expErr      string
-		uid         string
+		desc            string
+		host            string
+		user            string
+		password        string
+		database        string
+		applicationName string
+		tlsSettings     tlsSettings
+		expConnStr      string
+		expErr          string
+		uid             string
 	}{
 		{
 			desc:        "Unix socket host",
@@ -58,6 +59,16 @@ func TestIntegrationGenerateConnectionString(t *testing.T) {
 			database:    "database",
 			tlsSettings: tlsSettings{Mode: "verify-full"},
 			expConnStr:  "user='user' password='password' host='host' dbname='database' sslmode='verify-full'",
+		},
+		{
+			desc:            "TCP host",
+			host:            "host",
+			user:            "user",
+			password:        "password",
+			database:        "database",
+			applicationName: "applicationName",
+			tlsSettings:     tlsSettings{Mode: "verify-full"},
+			expConnStr:      "user='user' password='password' host='host' dbname='database' application_name='applicationName' sslmode='verify-full'",
 		},
 		{
 			desc:        "TCP/port host",
@@ -144,6 +155,7 @@ func TestIntegrationGenerateConnectionString(t *testing.T) {
 			}
 
 			ds := sqleng.DataSourceInfo{
+				JsonData:                sqleng.JsonData{ApplicationName: tt.applicationName},
 				URL:                     tt.host,
 				User:                    tt.user,
 				DecryptedSecureJSONData: map[string]string{"password": tt.password},

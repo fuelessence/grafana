@@ -175,6 +175,10 @@ func (s *Service) generateConnectionString(dsInfo sqleng.DataSourceInfo) (string
 		connStr += fmt.Sprintf(" port=%d", port)
 	}
 
+	if escape(dsInfo.JsonData.ApplicationName) != "" {
+		connStr += fmt.Sprintf(" application_name='%s'", escape(dsInfo.JsonData.ApplicationName))
+	}
+
 	tlsSettings, err := s.tlsManager.getTLSSettings(dsInfo)
 	if err != nil {
 		return "", err
